@@ -22,6 +22,7 @@ import de.greenrobot.event.EventBus;
 public class BluetoothClient implements Runnable {
 
     private boolean CONTINUE_READ_WRITE = true;
+    private boolean KEEP_TRYING = true;
 
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mBluetoothDevice;
@@ -35,6 +36,7 @@ public class BluetoothClient implements Runnable {
     private BluetoothConnector mBluetoothConnector;
 
     public BluetoothClient(BluetoothAdapter bluetoothAdapter, String adressMac) {
+        KEEP_TRYING = true;
         mBluetoothAdapter = bluetoothAdapter;
         mAdressMac = adressMac;
         mUuid = UUID.fromString("e0917680-d427-11e4-8830-" + bluetoothAdapter.getAddress().replace(":", ""));
@@ -47,7 +49,7 @@ public class BluetoothClient implements Runnable {
 //        List<UUID> uuidCandidates = new ArrayList<UUID>();
 //        uuidCandidates.add(mUuid);
 
-        while(mInputStream == null){
+        while(mInputStream == null && KEEP_TRYING){
             mBluetoothConnector = new BluetoothConnector(mBluetoothDevice, true, mBluetoothAdapter, mUuid);
 
             try {
@@ -110,6 +112,9 @@ public class BluetoothClient implements Runnable {
     }
 
     public void closeConnexion() {
+        
+        KEEP_TRYING = false;
+        
         if (mSocket != null) {
             try {
                 mInputStream.close();
